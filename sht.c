@@ -182,6 +182,10 @@ void *sht_iter_next(sht_it_t *it) {
 			    ->table[(it->cur - 1) * sht->item_size + sizeof(uint32_t)];
 	}
 	it->valid = 0;
-	sht->free(it);
 	return NULL;
+}
+
+void sht_iter_destroy(sht_it_t *it) {
+	assert(it != NULL);
+	it->sht->free(it);
 }
