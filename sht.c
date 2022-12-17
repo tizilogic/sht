@@ -55,7 +55,7 @@ void sht_destroy(sht_t *sht) {
 	free(sht);
 }
 
-static uint32_t insert(uint8_t *table, uint32_t k, uint32_t cap, void *el,
+static uint32_t insert(uint8_t *table, uint32_t k, uint32_t cap, const void *el,
                        uint32_t size) {
 	uint32_t id = k & (cap - 1);
 	for (;;) {
@@ -99,7 +99,7 @@ static uint32_t comp_key(const void *key, int len, uint32_t seed) {
 	return k;
 }
 
-void sht_set(sht_t *sht, const void *key, int len, void *element) {
+void sht_set(sht_t *sht, const void *key, int len, const void *element) {
 	assert(sht != NULL);
 	grow(sht);
 	if (insert(sht->table, comp_key(key, len, sht->seed), sht->capacity,

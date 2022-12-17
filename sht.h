@@ -49,7 +49,7 @@ void sht_destroy(sht_t *sht);
  * @param len The length in bytes of the passed key
  * @param item Pointer to the item 
  */
-void sht_set(sht_t *sht, const void *key, int len, void *item);
+void sht_set(sht_t *sht, const void *key, int len, const void *item);
 
 /**
  * @brief Get an item if present.
