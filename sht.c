@@ -99,22 +99,29 @@ static uint32_t comp_key(const void *key, int len, uint32_t seed) {
 	return k;
 }
 
-void sht_set(sht_t *sht, const void *key, int len, const void *element) {
+uint32_t sht_set(sht_t *sht, const void *key, int len, const void *element) {
 	assert(sht != NULL);
 	grow(sht);
-	if (insert(sht->table, comp_key(key, len, sht->seed), sht->capacity,
+	uint32_t hash = comp_key(key, len, sht->seed);
+	if (insert(sht->table, hash, sht->capacity,
 	           element, sht->item_size) > 0)
 		++(sht->size);
+	return hash;
 }
 
 void *sht_get(sht_t *sht, const void *key, int len) {
 	assert(sht != NULL);
 	uint32_t k = comp_key(key, len, sht->seed);
-	uint32_t id = k & (sht->capacity - 1);
+	return sht_get_by_hash(sht, k);
+}
+
+void *sht_get_by_hash(sht_t *sht, uint32_t hash) {
+	assert(sht != NULL);
+	uint32_t id = hash & (sht->capacity - 1);
 	for (;;) {
 		uint32_t cmp = *(uint32_t *)&sht->table[id * sht->item_size];
 		if (cmp == 0) return NULL;
-		if (cmp == k) break;
+		if (cmp == hash) break;
 		++id;
 		id = id % sht->capacity;
 	}

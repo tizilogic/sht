@@ -30,12 +30,12 @@ sht_t *sht_init_alloc(uint32_t item_size, uint32_t reserve, uint32_t seed,
 
 /**
  * @brief Initialize a new hashtable using the memory allocator from `stdlib.h`
- * 
+ *
  * @param item_size The size in bytes of an item
  * @param reserve Number of slots to reserve upon initialization (will be
  * rounded up to the next power of two)
  * @param seed Seed used by the hash function
- * @return sht_t* 
+ * @return sht_t*
  */
 sht_t *sht_init(uint32_t item_size, uint32_t reserve, uint32_t seed);
 
@@ -43,17 +43,18 @@ void sht_destroy(sht_t *sht);
 
 /**
  * @brief Add or overwrite an item in the hashtable.
- * 
+ *
  * @param sht Pointer to the hashtable
  * @param key Pointer to the key to be used
  * @param len The length in bytes of the passed key
- * @param item Pointer to the item 
+ * @param item Pointer to the item
+ * @return Hash value of the entry
  */
-void sht_set(sht_t *sht, const void *key, int len, const void *item);
+uint32_t sht_set(sht_t *sht, const void *key, int len, const void *item);
 
 /**
  * @brief Get an item if present.
- * 
+ *
  * @param sht Pointer to the hashtable
  * @param key Pointer to the key to be used
  * @param len The length in bytes of the passed key
@@ -62,8 +63,17 @@ void sht_set(sht_t *sht, const void *key, int len, const void *item);
 void *sht_get(sht_t *sht, const void *key, int len);
 
 /**
+ * @brief Get an item by its hash value if present.
+ *
+ * @param sht Pointer to the hashtable
+ * @param hash Hash value of the item
+ * @return void* of the requested item or NULL if not found
+ */
+void *sht_get_by_hash(sht_t *sht, uint32_t hash);
+
+/**
  * @brief Delete an item if present
- * 
+ *
  * @param sht Pointer to the hashtable
  * @param key Pointer to the key to be used
  * @param len The length in bytes of the passed key
@@ -72,9 +82,9 @@ void sht_del(sht_t *sht, const void *key, int len);
 
 /**
  * @brief Number of items stored in the hashtable
- * 
+ *
  * @param sht Pointer to the hashtable
- * @return uint32_t 
+ * @return uint32_t
  */
 uint32_t sht_size(sht_t *sht);
 
@@ -82,15 +92,15 @@ typedef struct sht_it sht_it_t;
 
 /**
  * @brief Get a new iterator for the hashtable
- * 
+ *
  * @param sht Pointer to the hashtable
- * @return sht_it_t* 
+ * @return sht_it_t*
  */
 sht_it_t *sht_iter(sht_t *sht);
 
 /**
- * @brief Get next item of the iterator. 
- * 
+ * @brief Get next item of the iterator.
+ *
  * @param it Pointer to the iterator
  * @return void* of the next item or `NULL`
  */
@@ -100,7 +110,7 @@ void sht_iter_destroy(sht_it_t *it);
 
 /**
  * @brief foreach macro to iterate over a hashtable that expects a pointer to the hashtable, a non initialized pointer to an iterator and a void * (or pointer to the item type).
- * 
+ *
  */
 #define sht_foreach(sht, it, item)                                             \
 	for ((it) = sht_iter((sht)), (item) = sht_iter_next((it)); (item) != NULL; \
