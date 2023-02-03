@@ -38,7 +38,7 @@ sht_t *sht_init_alloc(uint32_t item_size, uint32_t reserve, uint32_t seed,
 	sht->size = 0;
 	sht->capacity = next_power_of_two(reserve);
 	if (sht->capacity < 2) sht->capacity = 2;
-	sht->table = (uint8_t *)alloc(sht->capacity * sht->item_size);
+	sht->table = (uint8_t *)custom_alloc(sht->capacity * sht->item_size);
 	assert(sht->table != NULL);
 	memset(sht->table, 0, sht->capacity * sht->item_size);
 	return sht;
