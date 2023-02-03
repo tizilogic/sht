@@ -21,12 +21,13 @@ typedef struct sht sht_t;
  * @param reserve Number of slots to reserve upon initialization (will be
  * rounded up to the next power of two)
  * @param seed Seed used by the hash function
- * @param alloc Pointer to the allocation function
- * @param free Pointer to the function for freeing allocated memory
+ * @param custom_alloc Pointer to the allocation function
+ * @param custom_free Pointer to the function for freeing allocated memory
  * @return sht_t*
  */
 sht_t *sht_init_alloc(uint32_t item_size, uint32_t reserve, uint32_t seed,
-                      void *(*alloc)(size_t), void (*free)(void *));
+                      void *(*custom_alloc)(size_t),
+                      void (*custom_free)(void *));
 
 /**
  * @brief Initialize a new hashtable using the memory allocator from `stdlib.h`
@@ -109,7 +110,9 @@ void *sht_iter_next(sht_it_t *it);
 void sht_iter_destroy(sht_it_t *it);
 
 /**
- * @brief foreach macro to iterate over a hashtable that expects a pointer to the hashtable, a non initialized pointer to an iterator and a void * (or pointer to the item type).
+ * @brief foreach macro to iterate over a hashtable that expects a pointer to
+ * the hashtable, a non initialized pointer to an iterator and a void * (or
+ * pointer to the item type).
  *
  */
 #define sht_foreach(sht, it, item)                                             \

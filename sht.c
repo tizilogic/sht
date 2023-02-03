@@ -10,9 +10,8 @@ typedef struct sht {
 	uint32_t size;
 	uint32_t capacity;
 	uint32_t seed;
-	void *(*alloc)(size_t);
-	void *(*realloc)(void *, size_t);
-	void (*free)(void *);
+	void *(*myalloc)(size_t);
+	void (*myfree)(void *);
 } sht_t;
 
 static uint32_t next_power_of_two(uint32_t v) {
@@ -27,12 +26,12 @@ static uint32_t next_power_of_two(uint32_t v) {
 }
 
 sht_t *sht_init_alloc(uint32_t item_size, uint32_t reserve, uint32_t seed,
-                      void *(*alloc)(size_t), void (*free)(void *)) {
-	sht_t *sht = (sht_t *)alloc(sizeof(sht_t));
+                      void *(*custom_alloc)(size_t),
+                      void (*custom_free)(void *)) {
+	sht_t *sht = (sht_t *)custom_alloc(sizeof(sht_t));
 	assert(sht != NULL);
-	sht->alloc = alloc;
-	sht->realloc = realloc;
-	sht->free = free;
+	sht->myalloc = custom_alloc;
+	sht->myfree = custom_free;
 	// ensure 4 byte alignment and reserve additional space for hash value
 	sht->item_size = item_size + (item_size % 4) + sizeof(uint32_t);
 	sht->seed = seed;
@@ -51,8 +50,8 @@ sht_t *sht_init(uint32_t item_size, uint32_t reserve, uint32_t seed) {
 
 void sht_destroy(sht_t *sht) {
 	assert(sht != NULL);
-	if (sht->table != NULL) free(sht->table);
-	free(sht);
+	if (sht->table != NULL) sht->myfree(sht->table);
+	sht->myfree(sht);
 }
 
 static uint32_t insert(uint8_t *table, uint32_t k, uint32_t cap, const void *el,
@@ -78,7 +77,7 @@ static void grow(sht_t *sht) {
 	sht_t tmp;
 	memcpy(&tmp, sht, sizeof(sht_t));
 	tmp.capacity = sht->capacity << 1;
-	tmp.table = (uint8_t *)sht->alloc(tmp.capacity * sht->item_size);
+	tmp.table = (uint8_t *)sht->myalloc(tmp.capacity * sht->item_size);
 	assert(tmp.table != NULL);
 	memset(tmp.table, 0, tmp.capacity * tmp.item_size);
 	for (uint32_t i = 0; i < sht->capacity; ++i) {
@@ -88,7 +87,7 @@ static void grow(sht_t *sht) {
 		       &sht->table[i * tmp.item_size + sizeof(uint32_t)],
 		       tmp.item_size);
 	}
-	free(sht->table);
+	sht->myfree(sht->table);
 	memcpy(sht, &tmp, sizeof(sht_t));
 }
 
@@ -103,8 +102,7 @@ uint32_t sht_set(sht_t *sht, const void *key, int len, const void *element) {
 	assert(sht != NULL);
 	grow(sht);
 	uint32_t hash = comp_key(key, len, sht->seed);
-	if (insert(sht->table, hash, sht->capacity,
-	           element, sht->item_size) > 0)
+	if (insert(sht->table, hash, sht->capacity, element, sht->item_size) > 0)
 		++(sht->size);
 	return hash;
 }
@@ -170,7 +168,7 @@ typedef struct sht_it {
 
 sht_it_t *sht_iter(sht_t *sht) {
 	assert(sht != NULL);
-	sht_it_t *it = (sht_it_t *)sht->alloc(sizeof(sht_it_t));
+	sht_it_t *it = (sht_it_t *)sht->myalloc(sizeof(sht_it_t));
 	assert(it != NULL);
 	it->sht = sht;
 	it->cur = 0;
@@ -194,5 +192,5 @@ void *sht_iter_next(sht_it_t *it) {
 
 void sht_iter_destroy(sht_it_t *it) {
 	assert(it != NULL);
-	it->sht->free(it);
+	it->sht->myfree(it);
 }
