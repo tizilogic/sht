@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-typedef struct sht {
+struct sht {
 	uint8_t *table;
 	uint32_t item_size;
 	uint32_t size;
@@ -12,7 +12,7 @@ typedef struct sht {
 	uint32_t seed;
 	void *(*myalloc)(size_t);
 	void (*myfree)(void *);
-} sht_t;
+};
 
 static uint32_t next_power_of_two(uint32_t v) {
 	v--;
@@ -160,11 +160,11 @@ uint32_t sht_size(sht_t *sht) {
 	return sht->size;
 }
 
-typedef struct sht_it {
+struct sht_it {
 	sht_t *sht;
 	uint32_t cur;
 	int valid;
-} sht_it_t;
+};
 
 sht_it_t *sht_iter(sht_t *sht) {
 	assert(sht != NULL);

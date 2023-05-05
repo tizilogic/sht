@@ -25,9 +25,9 @@ int main(void) {
 		v = 43;
 		sht_set(sht, &k, sizeof(int), &v);
 		k = 1;
-		printf("Number of items in the hashtable: %lu\n", sht_size(sht));
+		printf("Number of items in the hashtable: %u\n", sht_size(sht));
 		sht_del(sht, &k, sizeof(int));
-		printf("Number of items in the hashtable (after delete): %lu\n",
+		printf("Number of items in the hashtable (after delete): %u\n",
 		       sht_size(sht));
 
 		int *item;
@@ -55,7 +55,7 @@ int main(void) {
 		memset(item.name, 0, MAX_NAME_LEN);
 		strncpy(item.name, "Bob", min_val(strlen("Bob") + 1, MAX_NAME_LEN - 1));
 		sht_set(sht, &item.id, sizeof(int), &item);
-		printf("Number of items in the hashtable: %lu\n", sht_size(sht));
+		printf("Number of items in the hashtable: %u\n", sht_size(sht));
 
 		my_type_t *v;
 		sht_it_t *it;
