@@ -54,6 +54,15 @@ void sht_destroy(sht_t *sht);
 uint32_t sht_set(sht_t *sht, const void *key, int len, const void *item);
 
 /**
+ * @brief Add or overwrite an item in the hashtable with a specific hash value.
+ * 
+ * @param sht Pointer to the hashtable
+ * @param hash The hash value of the item
+ * @param item Pointer to the item
+ */
+void sht_set_by_hash(sht_t *sht, uint32_t hash, const void *item);
+
+/**
  * @brief Get an item if present.
  *
  * @param sht Pointer to the hashtable

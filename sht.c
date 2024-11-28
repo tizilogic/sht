@@ -98,12 +98,16 @@ static uint32_t comp_key(const void *key, int len, uint32_t seed) {
 	return k;
 }
 
+void sht_set_by_hash(sht_t *sht, uint32_t hash, const void *item) {
+	if (insert(sht->table, hash, sht->capacity, item, sht->item_size) > 0)
+		++(sht->size);
+}
+
 uint32_t sht_set(sht_t *sht, const void *key, int len, const void *element) {
 	assert(sht != NULL);
 	grow(sht);
 	uint32_t hash = comp_key(key, len, sht->seed);
-	if (insert(sht->table, hash, sht->capacity, element, sht->item_size) > 0)
-		++(sht->size);
+	sht_set_by_hash(sht, hash, element);
 	return hash;
 }
 
